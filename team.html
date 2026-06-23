@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARAN Esport — Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--violet:#7553d6;--orange:#ff9f50;--white:#e9e9e9;--dark:#07070f;--dark2:#0c0c18;--v20:rgba(117,83,214,.20);}
+html{scroll-behavior:smooth;}
+body{background:var(--dark);color:var(--white);font-family:'Rajdhani',sans-serif;overflow-x:hidden;}
+#bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;mix-blend-mode:screen;opacity:0;transition:opacity 1.2s;}
+body.glow-ready #bg-glow{opacity:1;}
+
+nav{position:fixed;inset:0 0 auto 0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:70px;transition:background .4s,border-color .4s;border-bottom:1px solid transparent;}
+nav.scrolled{background:rgba(7,7,15,.88);backdrop-filter:blur(14px);border-color:var(--v20);}
+.nav-logo img{height:40px;display:block;}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{color:var(--white);text-decoration:none;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;opacity:.55;transition:opacity .2s,color .2s;}
+.nav-links a:hover,.nav-links a.active{opacity:1;color:var(--orange);}
+.nav-discord{display:inline-flex;align-items:center;gap:8px;padding:7px 20px;border:1px solid var(--violet);color:var(--violet)!important;opacity:1!important;font-weight:700!important;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);transition:background .2s,color .2s!important;}
+.nav-discord:hover{background:var(--violet);color:#fff!important;}
+.menu-btn{display:flex;align-items:center;gap:10px;background:transparent;border:none;cursor:pointer;color:var(--white);font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;opacity:.65;transition:opacity .2s;flex-shrink:0;padding:0;}
+.menu-btn:hover{opacity:1;}
+.mb-bars{display:flex;flex-direction:column;gap:4.5px;}
+.mb-bars i{display:block;width:22px;height:1.5px;background:var(--orange);border-radius:1px;transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .2s;transform-origin:center;}
+.menu-btn.is-open .mb-bars i:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.menu-btn.is-open .mb-bars i:nth-child(2){opacity:0;transform:scaleX(0);}
+.menu-btn.is-open .mb-bars i:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+
+.menu-overlay{position:fixed;inset:0;z-index:300;background:#05050d;clip-path:circle(0% at calc(100% - 52px) 35px);transition:clip-path .9s cubic-bezier(.7,0,.2,1);display:flex;flex-direction:column;pointer-events:none;overflow:hidden;}
+.menu-overlay.open{clip-path:circle(150% at calc(100% - 52px) 35px);pointer-events:all;}
+.menu-overlay::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.05) 3px,rgba(0,0,0,.05) 4px);pointer-events:none;z-index:0;}
+.mo-head{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:70px;border-bottom:1px solid rgba(117,83,214,.18);flex-shrink:0;position:relative;z-index:1;}
+.mo-logo{height:38px;width:auto;display:block;}
+.mo-head-nav{display:flex;gap:28px;}
+.mo-head-nav a{color:rgba(233,233,233,.38);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;transition:color .2s;}
+.mo-head-nav a:hover{color:var(--orange);}
+.mo-close{background:transparent;border:none;cursor:pointer;color:rgba(233,233,233,.35);font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;display:flex;align-items:center;gap:9px;transition:color .2s;padding:0;}
+.mo-close:hover{color:var(--orange);}
+.mo-body{flex:1;display:grid;grid-template-columns:52% 48%;min-height:0;position:relative;z-index:1;}
+.mo-left{padding:32px 56px 32px 52px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(117,83,214,.14);overflow-y:auto;}
+.mo-grp-label{font-size:.58rem;letter-spacing:.4em;text-transform:uppercase;color:var(--violet);font-weight:600;margin-bottom:16px;display:block;}
+.mo-player{display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:default;position:relative;transition:padding-left .3s cubic-bezier(.4,0,.2,1);}
+.mo-player:last-child{border-bottom:none;}
+.mo-player:hover{padding-left:10px;}
+.mo-player::before{content:'';position:absolute;left:-52px;top:0;bottom:0;width:2px;background:var(--pc,var(--violet));opacity:0;transition:opacity .28s;}
+.mo-player:hover::before{opacity:1;}
+.mo-num{font-family:'Rajdhani',sans-serif;font-size:.62rem;color:var(--orange);letter-spacing:.1em;min-width:20px;opacity:.5;flex-shrink:0;}
+.mo-pname{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.5rem,2.5vw,2.4rem);letter-spacing:.04em;color:rgba(233,233,233,.65);transition:color .22s;line-height:1;}
+.mo-player:hover .mo-pname{color:#fff;}
+.mo-role{margin-left:auto;display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.mo-kanji{font-size:1rem;line-height:1;color:var(--pc,rgba(233,233,233,.3));opacity:.5;transition:opacity .22s;}
+.mo-player:hover .mo-kanji{opacity:1;}
+.mo-role-txt{font-family:'Rajdhani',sans-serif;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(233,233,233,.2);font-weight:500;}
+.mo-socials{display:flex;gap:22px;margin-top:26px;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);}
+.mo-socials a{font-family:'Rajdhani',sans-serif;font-size:.65rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(233,233,233,.22);text-decoration:none;transition:color .2s;}
+.mo-socials a:hover{color:var(--orange);}
+.mo-right{position:relative;background:#03030a;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.rl-field-svg{width:100%;height:100%;padding:20px;display:block;}
+.map-player-label{position:absolute;top:22px;left:26px;font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,3vw,2.8rem);letter-spacing:.06em;opacity:0;transition:opacity .28s,color .28s;z-index:2;pointer-events:none;line-height:1;text-shadow:0 0 28px currentColor;}
+.map-role-label{position:absolute;top:62px;left:28px;font-family:'Rajdhani',sans-serif;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(233,233,233,.3);opacity:0;transition:opacity .28s;z-index:2;pointer-events:none;}
+.map-legend{position:absolute;bottom:14px;left:26px;font-size:.52rem;letter-spacing:.26em;text-transform:uppercase;color:rgba(233,233,233,.16);font-family:'Rajdhani',sans-serif;z-index:2;pointer-events:none;}
+.pmk{transition:opacity .3s ease;}
+
+.btn{display:inline-block;padding:11px 30px;font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;transition:all .22s;cursor:pointer;border:none;clip-path:polygon(7px 0%,100% 0%,calc(100% - 7px) 100%,0% 100%);}
+.btn-primary{background:var(--violet);color:#fff;}
+.btn-primary:hover{background:#8a65e8;transform:translateY(-2px);box-shadow:0 8px 28px rgba(117,83,214,.45);}
+.btn-outline{background:transparent;color:var(--orange);border:1px solid var(--orange);}
+.btn-outline:hover{background:var(--orange);color:#000;transform:translateY(-2px);}
+
+.label{display:block;font-size:.62rem;letter-spacing:.38em;text-transform:uppercase;color:var(--violet);font-weight:600;margin-bottom:10px;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5rem);letter-spacing:.04em;line-height:.95;}
+
+footer{position:relative;z-index:1;background:#040408;padding:44px 60px;border-top:1px solid var(--v20);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;}
+.footer-logo img{height:34px;display:block;}
+.footer-links{display:flex;gap:26px;list-style:none;flex-wrap:wrap;}
+.footer-links a{color:rgba(233,233,233,.28);text-decoration:none;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;transition:color .2s;}
+.footer-links a:hover{color:var(--orange);}
+.footer-copy{font-size:.65rem;color:rgba(233,233,233,.18);letter-spacing:.1em;}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease;}
+.reveal.up{opacity:1;transform:none;}
+
+#page-hero{position:relative;height:78vh;min-height:520px;overflow:hidden;display:flex;align-items:flex-end;padding:0 60px 70px;}
+.page-hero-bg{position:absolute;inset:-12%;background-size:cover;background-position:center top;will-change:transform;filter:brightness(.42);}
+.page-hero-vignette{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(7,7,15,.3) 0%,transparent 35%,rgba(7,7,15,.92) 100%);}
+.page-hero-content{position:relative;z-index:2;}
+.page-hero-content h1 em{color:var(--violet);font-style:normal;}
+
+#team-section{position:relative;z-index:1;padding:90px 60px 110px;}
+.team-header{max-width:1280px;margin:0 auto 48px;display:flex;align-items:flex-end;justify-content:space-between;}
+.team-grid{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+
+.pcard{position:relative;padding-bottom:47%;perspective:1200px;border-radius:3px;overflow:visible;}
+.pcard::after{content:'';position:absolute;inset:-4px;border-radius:5px;z-index:-1;opacity:0;filter:blur(14px);transition:opacity .35s;background:var(--pglow,var(--violet));}
+.pcard:hover::after{opacity:.5;}
+.pcard-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.4,0,.2,1);}
+.pcard:hover .pcard-inner{transform:rotateY(180deg);}
+.pcard-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:3px;overflow:hidden;}
+.pcard-face img{width:100%;height:100%;object-fit:cover;display:block;}
+.pcard-back{transform:rotateY(180deg);}
+
+.ph-card{width:100%;height:100%;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;padding:18px 22px;position:relative;overflow:hidden;background:linear-gradient(135deg,#090911 0%,rgba(var(--pcr),.1) 100%);border:1px solid rgba(var(--pcr),.18);}
+.ph-card::after{content:attr(data-kanji);position:absolute;right:-8px;top:-18px;font-size:8rem;line-height:1;color:rgba(var(--pcr),.07);font-family:serif;pointer-events:none;user-select:none;}
+.ph-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.4rem,2.5vw,2.2rem);color:rgba(233,233,233,.75);letter-spacing:.06em;position:relative;z-index:1;line-height:1;}
+.ph-role{font-family:'Rajdhani',sans-serif;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(var(--pcr),.7);margin-top:5px;position:relative;z-index:1;}
+.ph-badge{position:absolute;top:13px;right:13px;font-family:'Rajdhani',sans-serif;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(233,233,233,.18);}
+.ph-back{background:linear-gradient(135deg,#050509 0%,rgba(var(--pcr),.08) 100%);border:1px solid rgba(var(--pcr),.12);width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative;}
+.ph-back::after{content:attr(data-kanji);position:absolute;font-size:6rem;color:rgba(var(--pcr),.06);font-family:serif;user-select:none;}
+.ph-back-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:rgba(var(--pcr),.45);letter-spacing:.08em;position:relative;z-index:1;}
+.ph-back-label{font-family:'Rajdhani',sans-serif;font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(233,233,233,.2);position:relative;z-index:1;}
+
+#lineup-section{position:relative;z-index:1;padding:0 60px 110px;text-align:center;}
+.lineup-img{width:100%;max-width:1280px;margin:0 auto;display:block;border-radius:3px;box-shadow:0 0 80px rgba(117,83,214,.14);}
+
+@media(max-width:1000px){.team-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){
+  nav{padding:0 20px;}
+  .nav-links{display:none;}
+  #page-hero{padding:0 24px 44px;height:60vh;}
+  #team-section{padding:60px 20px 80px;}
+  .team-grid{grid-template-columns:1fr;}
+  #lineup-section{padding:0 20px 80px;}
+  footer{padding:36px 24px;flex-direction:column;align-items:center;text-align:center;}
+  .mo-head{padding:0 20px;}
+  .mo-left{padding:24px 20px;}
+  .mo-body{grid-template-columns:1fr;}
+  .mo-right{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div id="bg-glow"></div>
+
+<nav id="navbar">
+  <a class="nav-logo" href="index.html"><img src="LOGO_Blanc_TRS.png" alt="ARAN Esport"></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="team.html" class="active">Team</a></li>
+    <li><a href="rl.html">Rocket League</a></li>
+    <li><a href="about.html">Aran's Family</a></li>
+    <li><a href="#" class="nav-discord">Discord</a></li>
+  </ul>
+  <button class="menu-btn" id="menuBtn" aria-label="Ouvrir le menu">
+    <span class="mb-txt">Menu</span>
+    <span class="mb-bars"><i></i><i></i><i></i></span>
+  </button>
+</nav>
+
+<section id="page-hero">
+  <div class="page-hero-bg" id="heroBg" style="background-image:url('f549856f-aaee-47da-8b46-379063129754.png')"></div>
+  <div class="page-hero-vignette"></div>
+  <div class="page-hero-content">
+    <span class="label reveal">Saison 2026</span>
+    <h1 class="section-title reveal" style="transition-delay:.08s">LES 8<br><em>GUERRIERS</em></h1>
+    <p class="reveal" style="font-size:1.05rem;color:rgba(233,233,233,.46);letter-spacing:.06em;margin-top:12px;transition-delay:.16s">8 joueurs · 8 éléments · Une seule cible.</p>
+  </div>
+</section>
+
+<section id="team-section">
+  <div class="team-header reveal">
+    <div>
+      <span class="label">Line-Up 2026</span>
+      <h2 class="section-title">NOS <span style="color:var(--violet)">JOUEURS</span></h2>
+    </div>
+    <p style="max-width:340px;font-size:.9rem;color:rgba(233,233,233,.38);line-height:1.65;text-align:right">Hover sur chaque carte pour découvrir le Fennec du joueur. 9 identités visuelles, 9 éléments.</p>
+  </div>
+  <div class="team-grid">
+
+    <div class="pcard reveal" style="--pglow:#999" data-delay="0">
+      <div class="pcard-inner">
+        <div class="pcard-face"><img src="Goto.png" alt="GOTO"></div>
+        <div class="pcard-face pcard-back"><img src="Goto_fennec.png" alt="GOTO Fennec"></div>
+      </div>
+    </div>
+
+    <div class="pcard reveal" style="--pglow:#e84040;transition-delay:.07s">
+      <div class="pcard-inner">
+        <div class="pcard-face"><img src="Rengoku.png" alt="RENGOKU"></div>
+        <div class="pcard-face pcard-back"><img src="Rengoku_fennec.png" alt="RENGOKU Fennec"></div>
+      </div>
+    </div>
+
+    <div class="pcard reveal" style="--pglow:#f5c842;transition-delay:.14s">
+      <div class="pcard-inner">
+        <div class="pcard-face"><img src="Zenitsu.png" alt="ZENITSU"></div>
+        <div class="pcard-face pcard-back"><img src="Zenitsu_fennec.png" alt="ZENITSU Fennec"></div>
+      </div>
+    </div>
+
+    <div class="pcard reveal" style="--pglow:#3cb872;transition-delay:.07s">
+      <div class="pcard-inner">
+        <div class="pcard-face"><img src="Kamado.png" alt="KAMADO"></div>
+        <div class="pcard-face pcard-back"><img src="Kamado_fennec.png" alt="KAMADO Fennec"></div>
+      </div>
+    </div>
+
+    <div class="pcard reveal" style="--pglow:#00e5d1;transition-delay:.14s">
+      <div class="pcard-inner">
+        <div class="pcard-face"><img src="Tokito.png" alt="TOKITO"></div>
+        <div class="pcard-face pcard-back"><img src="TOKITO_FENNEC.png" alt="TOKITO Fennec"></div>
+      </div>
+    </div>
+
+    <div class="pcard reveal" style="--pglow:#8bc34a;transition-delay:.21s">
+      <div class="pcard-inner">
+        <div class="pcard-face"><img src="Inosuke.png" alt="INOSUKE"></div>
+        <div class="pcard-face pcard-back"><img src="Inosuke_fennec.png" alt="INOSUKE Fennec"></div>
+      </div>
+    </div>
+
+    <div class="pcard reveal" style="--pglow:#e0a830;transition-delay:.07s">
+      <div class="pcard-inner">
+        <div class="pcard-face"><img src="Tengen.png" alt="TENGEN"></div>
+        <div class="pcard-face pcard-back"><img src="Tengen_fennec.png" alt="TENGEN Fennec"></div>
+      </div>
+    </div>
+
+    <div class="pcard reveal" style="--pglow:#2d7dd2;transition-delay:.14s">
+      <div class="pcard-inner">
+        <div class="pcard-face"><img src="Tomioka.png" alt="TOMIOKA"></div>
+        <div class="pcard-face pcard-back"><img src="Tomioka_fennec.png" alt="TOMIOKA Fennec"></div>
+      </div>
+    </div>
+
+    <div class="pcard reveal" style="--pglow:#9b59b6;transition-delay:.21s">
+      <div class="pcard-inner">
+        <div class="pcard-face"><img src="Obanai.png" alt="OBANAI"></div>
+        <div class="pcard-face pcard-back"><img src="Obanai_fennec.png" alt="OBANAI Fennec"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="lineup-section">
+  <span class="label reveal">Formation officielle</span>
+  <img src="f549856f-aaee-47da-8b46-379063129754.png" alt="8 Line-Ups ARAN Esport 2026" class="lineup-img reveal" style="transition-delay:.1s">
+</section>
+
+<div class="menu-overlay" id="menuOverlay">
+  <div class="mo-head">
+    <img src="LOGO_Blanc_TRS.png" class="mo-logo" alt="ARAN Esport">
+    <nav class="mo-head-nav">
+      <a href="index.html">Accueil</a>
+      <a href="team.html">Team</a>
+      <a href="rl.html">Rocket League</a>
+      <a href="about.html">Aran's Family</a>
+    </nav>
+    <button class="mo-close" id="menuClose">Fermer <span>✕</span></button>
+  </div>
+  <div class="mo-body">
+    <div class="mo-left">
+      <span class="mo-grp-label">Line-Up 2026 — 8 Guerriers</span>
+      <div class="mo-player" data-player="rengoku" data-role="Attaquant · 炎 Feu" style="--pc:#e84040">
+        <span class="mo-num">01</span>
+        <span class="mo-pname">RENGOKU</span>
+        <span class="mo-role"><span class="mo-kanji">炎</span><span class="mo-role-txt">Attaquant</span></span>
+      </div>
+      <div class="mo-player" data-player="zenitsu" data-role="Ailier gauche · 雷 Tonnerre" style="--pc:#f5c842">
+        <span class="mo-num">02</span>
+        <span class="mo-pname">ZENITSU</span>
+        <span class="mo-role"><span class="mo-kanji">雷</span><span class="mo-role-txt">Ailier G.</span></span>
+      </div>
+      <div class="mo-player" data-player="kamado" data-role="Ailier droit · 風 Vent" style="--pc:#3cb872">
+        <span class="mo-num">03</span>
+        <span class="mo-pname">KAMADO</span>
+        <span class="mo-role"><span class="mo-kanji">風</span><span class="mo-role-txt">Ailier D.</span></span>
+      </div>
+      <div class="mo-player" data-player="tokito" data-role="Milieu gauche · 霧 Brume" style="--pc:#00e5d1">
+        <span class="mo-num">04</span>
+        <span class="mo-pname">TOKITO</span>
+        <span class="mo-role"><span class="mo-kanji">霧</span><span class="mo-role-txt">Milieu G.</span></span>
+      </div>
+      <div class="mo-player" data-player="inosuke" data-role="Milieu droit · 土 Terre" style="--pc:#8bc34a">
+        <span class="mo-num">05</span>
+        <span class="mo-pname">INOSUKE</span>
+        <span class="mo-role"><span class="mo-kanji">土</span><span class="mo-role-txt">Milieu D.</span></span>
+      </div>
+      <div class="mo-player" data-player="tengen" data-role="Défenseur gauche · 音 Son" style="--pc:#e0a830">
+        <span class="mo-num">06</span>
+        <span class="mo-pname">TENGEN</span>
+        <span class="mo-role"><span class="mo-kanji">音</span><span class="mo-role-txt">Défenseur G.</span></span>
+      </div>
+      <div class="mo-player" data-player="tomioka" data-role="Défenseur droit · 水 Eau" style="--pc:#2d7dd2">
+        <span class="mo-num">07</span>
+        <span class="mo-pname">TOMIOKA</span>
+        <span class="mo-role"><span class="mo-kanji">水</span><span class="mo-role-txt">Défenseur D.</span></span>
+      </div>
+      <div class="mo-player" data-player="obanai" data-role="Gardien · 霧 Brume" style="--pc:#9b59b6">
+        <span class="mo-num">08</span>
+        <span class="mo-pname">OBANAI</span>
+        <span class="mo-role"><span class="mo-kanji">霧</span><span class="mo-role-txt">Gardien</span></span>
+      </div>
+      <div class="mo-socials">
+        <a href="#">Discord</a>
+        <a href="#">Twitch</a>
+        <a href="#">Twitter / X</a>
+        <a href="#">YouTube</a>
+      </div>
+    </div>
+    <div class="mo-right" id="menuMap">
+      <div class="map-player-label" id="mapPlayerLabel"></div>
+      <div class="map-role-label" id="mapRoleLabel"></div>
+      <span class="map-legend">ARAN Esport · Rocket League · Formation 3-2-2-1</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo"><img src="LOGO_Blanc_TRS.png" alt="ARAN Esport"></div>
+  <ul class="footer-links">
+    <li><a href="team.html">Team</a></li>
+    <li><a href="rl.html">Rocket League</a></li>
+    <li><a href="about.html">Aran's Family</a></li>
+    <li><a href="#">Discord</a></li>
+  </ul>
+  <span class="footer-copy">© 2026 ARAN Esport — All rights reserved</span>
+</footer>
+
+<script>
+const glowEl=document.getElementById('bg-glow');
+let gx=window.innerWidth/2,gy=window.innerHeight/2,tx=gx,ty=gy,glowRaf=null;
+function lerp(a,b,t){return a+(b-a)*t;}
+function glowLoop(){
+  gx=lerp(gx,tx,.06);gy=lerp(gy,ty,.06);
+  glowEl.style.background=`radial-gradient(ellipse 60vw 55vh at ${gx}px ${gy}px,rgba(117,83,214,.11) 0%,rgba(255,159,80,.055) 40%,transparent 70%)`;
+  glowRaf=requestAnimationFrame(glowLoop);
+}
+document.addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;if(!glowRaf){document.body.classList.add('glow-ready');glowLoop();}});
+
+const navbar=document.getElementById('navbar');
+window.addEventListener('scroll',()=>navbar.classList.toggle('scrolled',scrollY>50),{passive:true});
+
+const heroBg=document.getElementById('heroBg');
+if(heroBg){window.addEventListener('scroll',()=>{heroBg.style.transform=`translateY(${scrollY*.28}px)`;},{passive:true});}
+
+const revealObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('up');revealObs.unobserve(e.target);}});},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
+
+const RL_FIELD=`<svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" class="rl-field-svg"><defs><radialGradient id="fgrd" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#0d1825"/><stop offset="100%" stop-color="#070810"/></radialGradient></defs><rect width="400" height="500" fill="url(#fgrd)"/><rect x="14" y="14" width="372" height="472" fill="#090f1e" rx="18"/><line x1="200" y1="14" x2="200" y2="486" stroke="rgba(255,255,255,.04)" stroke-width="1"/><rect x="14" y="14" width="372" height="472" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="2" rx="18"/><line x1="14" y1="250" x2="386" y2="250" stroke="rgba(255,255,255,.16)" stroke-width="1.5"/><circle cx="200" cy="250" r="52" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="1.5"/><circle cx="200" cy="250" r="3.5" fill="rgba(255,255,255,.4)"/><rect x="134" y="0" width="132" height="20" fill="rgba(60,120,255,.18)" stroke="rgba(80,140,255,.45)" stroke-width="1.5" rx="3"/><text x="200" y="13" text-anchor="middle" fill="rgba(80,140,255,.5)" font-size="6.5" letter-spacing="3" font-family="Rajdhani,sans-serif" font-weight="700">ADVERSAIRE</text><rect x="134" y="480" width="132" height="20" fill="rgba(255,159,80,.18)" stroke="rgba(255,159,80,.5)" stroke-width="1.5" rx="3"/><text x="200" y="493" text-anchor="middle" fill="rgba(255,159,80,.55)" font-size="6.5" letter-spacing="3" font-family="Rajdhani,sans-serif" font-weight="700">ARAN</text><rect x="156" y="14" width="88" height="26" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="1"/><rect x="156" y="460" width="88" height="26" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="1"/><circle cx="52" cy="76" r="13" fill="rgba(255,200,0,.08)" stroke="rgba(255,200,0,.38)" stroke-width="1.5" stroke-dasharray="5 3"/><circle cx="52" cy="76" r="5" fill="rgba(255,200,0,.22)"/><circle cx="348" cy="76" r="13" fill="rgba(255,200,0,.08)" stroke="rgba(255,200,0,.38)" stroke-width="1.5" stroke-dasharray="5 3"/><circle cx="348" cy="76" r="5" fill="rgba(255,200,0,.22)"/><circle cx="14" cy="250" r="10" fill="rgba(255,200,0,.08)" stroke="rgba(255,200,0,.3)" stroke-width="1.5" stroke-dasharray="4 3"/><circle cx="386" cy="250" r="10" fill="rgba(255,200,0,.08)" stroke="rgba(255,200,0,.3)" stroke-width="1.5" stroke-dasharray="4 3"/><circle cx="52" cy="424" r="13" fill="rgba(255,200,0,.08)" stroke="rgba(255,200,0,.38)" stroke-width="1.5" stroke-dasharray="5 3"/><circle cx="52" cy="424" r="5" fill="rgba(255,200,0,.22)"/><circle cx="348" cy="424" r="13" fill="rgba(255,200,0,.08)" stroke="rgba(255,200,0,.38)" stroke-width="1.5" stroke-dasharray="5 3"/><circle cx="348" cy="424" r="5" fill="rgba(255,200,0,.22)"/><rect x="96" y="96" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,99,99)"/><rect x="298" y="96" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,301,99)"/><rect x="96" y="180" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,99,183)"/><rect x="298" y="180" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,301,183)"/><rect x="174" y="136" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,177,139)"/><rect x="218" y="136" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,221,139)"/><rect x="96" y="318" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,99,321)"/><rect x="298" y="318" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,301,321)"/><rect x="96" y="402" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,99,405)"/><rect x="298" y="402" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,301,405)"/><rect x="174" y="358" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,177,361)"/><rect x="218" y="358" width="6" height="6" fill="rgba(255,255,255,.16)" transform="rotate(45,221,361)"/><g id="mk-rengoku" class="pmk" opacity="0"><circle cx="200" cy="82" r="20" fill="rgba(232,64,64,.15)"/><circle cx="200" cy="82" r="9" fill="#e84040"/><circle cx="200" cy="82" r="9" fill="none" stroke="#e84040" stroke-width="1.5" opacity=".55"><animate attributeName="r" values="9;24;9" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".55;0;.55" dur="1.6s" repeatCount="indefinite"/></circle><text x="200" y="63" text-anchor="middle" fill="#e84040" font-size="7" font-family="Rajdhani,sans-serif" font-weight="700" letter-spacing="1.5">RENGOKU</text></g><g id="mk-zenitsu" class="pmk" opacity="0"><circle cx="100" cy="152" r="20" fill="rgba(245,200,66,.15)"/><circle cx="100" cy="152" r="9" fill="#f5c842"/><circle cx="100" cy="152" r="9" fill="none" stroke="#f5c842" stroke-width="1.5" opacity=".55"><animate attributeName="r" values="9;24;9" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".55;0;.55" dur="1.6s" repeatCount="indefinite"/></circle><text x="100" y="133" text-anchor="middle" fill="#f5c842" font-size="7" font-family="Rajdhani,sans-serif" font-weight="700" letter-spacing="1.5">ZENITSU</text></g><g id="mk-kamado" class="pmk" opacity="0"><circle cx="300" cy="152" r="20" fill="rgba(60,184,114,.15)"/><circle cx="300" cy="152" r="9" fill="#3cb872"/><circle cx="300" cy="152" r="9" fill="none" stroke="#3cb872" stroke-width="1.5" opacity=".55"><animate attributeName="r" values="9;24;9" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".55;0;.55" dur="1.6s" repeatCount="indefinite"/></circle><text x="300" y="133" text-anchor="middle" fill="#3cb872" font-size="7" font-family="Rajdhani,sans-serif" font-weight="700" letter-spacing="1.5">KAMADO</text></g><g id="mk-tokito" class="pmk" opacity="0"><circle cx="112" cy="245" r="20" fill="rgba(0,229,209,.15)"/><circle cx="112" cy="245" r="9" fill="#00e5d1"/><circle cx="112" cy="245" r="9" fill="none" stroke="#00e5d1" stroke-width="1.5" opacity=".55"><animate attributeName="r" values="9;24;9" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".55;0;.55" dur="1.6s" repeatCount="indefinite"/></circle><text x="112" y="226" text-anchor="middle" fill="#00e5d1" font-size="7" font-family="Rajdhani,sans-serif" font-weight="700" letter-spacing="1.5">TOKITO</text></g><g id="mk-inosuke" class="pmk" opacity="0"><circle cx="288" cy="255" r="20" fill="rgba(139,195,74,.15)"/><circle cx="288" cy="255" r="9" fill="#8bc34a"/><circle cx="288" cy="255" r="9" fill="none" stroke="#8bc34a" stroke-width="1.5" opacity=".55"><animate attributeName="r" values="9;24;9" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".55;0;.55" dur="1.6s" repeatCount="indefinite"/></circle><text x="288" y="236" text-anchor="middle" fill="#8bc34a" font-size="7" font-family="Rajdhani,sans-serif" font-weight="700" letter-spacing="1.5">INOSUKE</text></g><g id="mk-tengen" class="pmk" opacity="0"><circle cx="112" cy="345" r="20" fill="rgba(224,168,48,.15)"/><circle cx="112" cy="345" r="9" fill="#e0a830"/><circle cx="112" cy="345" r="9" fill="none" stroke="#e0a830" stroke-width="1.5" opacity=".55"><animate attributeName="r" values="9;24;9" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".55;0;.55" dur="1.6s" repeatCount="indefinite"/></circle><text x="112" y="326" text-anchor="middle" fill="#e0a830" font-size="7" font-family="Rajdhani,sans-serif" font-weight="700" letter-spacing="1.5">TENGEN</text></g><g id="mk-tomioka" class="pmk" opacity="0"><circle cx="288" cy="345" r="20" fill="rgba(45,125,210,.15)"/><circle cx="288" cy="345" r="9" fill="#2d7dd2"/><circle cx="288" cy="345" r="9" fill="none" stroke="#2d7dd2" stroke-width="1.5" opacity=".55"><animate attributeName="r" values="9;24;9" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".55;0;.55" dur="1.6s" repeatCount="indefinite"/></circle><text x="288" y="326" text-anchor="middle" fill="#2d7dd2" font-size="7" font-family="Rajdhani,sans-serif" font-weight="700" letter-spacing="1.5">TOMIOKA</text></g><g id="mk-obanai" class="pmk" opacity="0"><circle cx="200" cy="420" r="20" fill="rgba(155,89,182,.15)"/><circle cx="200" cy="420" r="9" fill="#9b59b6"/><circle cx="200" cy="420" r="9" fill="none" stroke="#9b59b6" stroke-width="1.5" opacity=".55"><animate attributeName="r" values="9;24;9" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".55;0;.55" dur="1.6s" repeatCount="indefinite"/></circle><text x="200" y="401" text-anchor="middle" fill="#9b59b6" font-size="7" font-family="Rajdhani,sans-serif" font-weight="700" letter-spacing="1.5">OBANAI</text></g></svg>`;
+document.getElementById('menuMap').insertAdjacentHTML('afterbegin',RL_FIELD);
+
+const menuOverlay=document.getElementById('menuOverlay'),menuBtn=document.getElementById('menuBtn'),menuClose=document.getElementById('menuClose'),mapLabel=document.getElementById('mapPlayerLabel'),mapRole=document.getElementById('mapRoleLabel');
+function openMenu(){menuOverlay.classList.add('open');menuBtn.classList.add('is-open');document.body.style.overflow='hidden';}
+function closeMenu(){menuOverlay.classList.remove('open');menuBtn.classList.remove('is-open');document.body.style.overflow='';}
+menuBtn.addEventListener('click',openMenu);
+menuClose.addEventListener('click',closeMenu);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
+document.querySelectorAll('.mo-player').forEach(el=>{
+  const id=el.dataset.player,color=getComputedStyle(el).getPropertyValue('--pc').trim(),role=el.dataset.role||'',mk=document.getElementById('mk-'+id);
+  el.addEventListener('mouseenter',()=>{if(mk)mk.style.opacity='1';mapLabel.textContent=el.querySelector('.mo-pname').textContent;mapLabel.style.color=color;mapLabel.style.opacity='1';mapRole.textContent=role;mapRole.style.opacity='1';});
+  el.addEventListener('mouseleave',()=>{if(mk)mk.style.opacity='0';mapLabel.style.opacity='0';mapRole.style.opacity='0';});
+});
+</script>
+</body>
+</html>
