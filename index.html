@@ -1402,6 +1402,60 @@ track.addEventListener('mousemove', e => {
   e.preventDefault();
   track.scrollLeft = sl - (e.pageX - track.offsetLeft - sx) * 1.3;
 });
+
+// energy trail — ribbon
+(function(){
+  const PAL=['#7553d6','#e84040','#f5c842','#3cb872','#00e5d1','#8bc34a','#e0a830','#2d7dd2','#9b59b6','#ff9f50'];
+  const cvs=document.createElement('canvas');
+  cvs.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:998;mix-blend-mode:screen;';
+  document.body.appendChild(cvs);
+  const c2=cvs.getContext('2d');
+  let W=cvs.width=innerWidth,H=cvs.height=innerHeight;
+  window.addEventListener('resize',()=>{W=cvs.width=innerWidth;H=cvs.height=innerHeight;});
+  const hist=[];const MAX=60;
+  document.addEventListener('mousemove',e=>{hist.push({x:e.clientX,y:e.clientY});if(hist.length>MAX)hist.shift();});
+  let ci=0,prev=PAL[0],nxt=PAL[1],lt=0,cf=0,locked=null,lf=0,hov=null;
+  function ph(h){h=h.trim().replace('#','').padEnd(6,'0').slice(0,6);const n=parseInt(h,16);return[(n>>16)&255,(n>>8)&255,n&255];}
+  function lc(a,b,t){try{const ca=ph(a),cb=ph(b);return`rgb(${~~(ca[0]+(cb[0]-ca[0])*t)},${~~(ca[1]+(cb[1]-ca[1])*t)},${~~(ca[2]+(cb[2]-ca[2])*t)})`;}catch(e){return a;}}
+  function gcol(){
+    if(hov)return hov;if(locked)return locked;
+    if(++cf>90){prev=nxt;ci=(ci+1)%PAL.length;nxt=PAL[ci];lt=0;cf=0;}
+    lt=Math.min(lt+.025,1);return lc(prev,nxt,lt);
+  }
+  document.querySelectorAll('.player-card').forEach(el=>el.addEventListener('click',()=>{
+    const c=getComputedStyle(el).getPropertyValue('--pc').trim();if(c){locked=c;lf=360;}
+  }));
+  document.querySelectorAll('.mo-player').forEach(el=>{
+    const gc=()=>getComputedStyle(el).getPropertyValue('--pc').trim();
+    el.addEventListener('mouseenter',()=>{hov=gc()||null;});
+    el.addEventListener('mouseleave',()=>{hov=null;});
+    el.addEventListener('click',()=>{const c=gc();if(c){locked=c;lf=360;}});
+  });
+  (function loop(){
+    requestAnimationFrame(loop);
+    c2.clearRect(0,0,W,H);
+    if(lf>0)lf--;else if(lf===0&&locked)locked=null;
+    const col=gcol();
+    const n=hist.length;if(n<2)return;
+    c2.lineCap='round';c2.lineJoin='round';
+    for(let i=1;i<n;i++){
+      const t=i/(n-1),t2=t*t;
+      const a=hist[i-1],b=hist[i];
+      c2.strokeStyle=col;c2.shadowColor=col;
+      c2.globalAlpha=.07*t2;c2.lineWidth=26*t;c2.shadowBlur=30;
+      c2.beginPath();c2.moveTo(a.x,a.y);c2.lineTo(b.x,b.y);c2.stroke();
+      c2.globalAlpha=.22*t;c2.lineWidth=7*t;c2.shadowBlur=12;
+      c2.beginPath();c2.moveTo(a.x,a.y);c2.lineTo(b.x,b.y);c2.stroke();
+      c2.globalAlpha=.9*t;c2.lineWidth=1.8*t;c2.shadowBlur=4;
+      c2.beginPath();c2.moveTo(a.x,a.y);c2.lineTo(b.x,b.y);c2.stroke();
+    }
+    const h=hist[n-1];
+    c2.fillStyle=col;c2.shadowColor=col;
+    c2.globalAlpha=.65;c2.shadowBlur=42;c2.beginPath();c2.arc(h.x,h.y,5,0,Math.PI*2);c2.fill();
+    c2.globalAlpha=.25;c2.shadowBlur=65;c2.beginPath();c2.arc(h.x,h.y,13,0,Math.PI*2);c2.fill();
+    c2.globalAlpha=1;c2.shadowBlur=0;
+  })();
+})();
 </script>
 </body>
 </html>
